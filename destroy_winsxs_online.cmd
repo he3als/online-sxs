@@ -9,7 +9,7 @@ fltmc >nul 2>&1 || (
 	exit /b 0
 )
 
-set "psScript=%~f0" & powershell -nop -c "if (Test-Path """env:ngen""") { $ngen = $true }; Get-Content """$env:psScript""" -Raw | iex" & exit /b
+set "psScript=%~f0" & powershell -nop -c "Get-Content """$env:psScript""" -Raw | iex" & exit /b
 : end batch / begin PowerShell #>
 
 # config
@@ -23,7 +23,7 @@ $mumPath = "$packagePath\update.mum"
 # temp
 $cerPath = "$env:temp\Destroy-WinSxS-Online.cer"
 
-Write-Host "This will install a selected package online, which is your current install." -ForegroundColor Yellow
+Write-Host "This will install a specified unsigned CBS package in the script online, meaining live on your current install." -ForegroundColor Yellow
 Write-Host "Only run this in a virtual machine, it's highly experimental.`n" -ForegroundColor Red
 Start-Sleep 1
 pause
