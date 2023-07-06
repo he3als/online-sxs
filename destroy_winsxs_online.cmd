@@ -12,8 +12,8 @@ fltmc >nul 2>&1 || (
 set "psScript=%~f0" & powershell -nop -c "Get-Content """$env:psScript""" -Raw | iex" & exit /b
 : end batch / begin PowerShell #>
 
-# cabs also work, like "C:\Users\User\Desktop\NoDefender-Package31bf3856ad364e35amd641.0.0.0.cab"
-$packagePath = "C:\package"
+# here you can bypass the CAB file picker and set a static file or extracted CAB folder to use
+# $packagePath = "C:\package"
 
 # ----------- #
 
@@ -26,6 +26,16 @@ Write-Host "This will install a specified unsigned CBS package in the script onl
 Write-Host "Only run this in a virtual machine, it's highly experimental.`n" -ForegroundColor Red
 Start-Sleep 1
 pause
+
+if (!($packagePath)) {
+	Write-Warning "Opening file dialog to select CBS package CAB..."
+	$openFileDialog = New-Object System.Windows.Forms.OpenFileDialog
+	$openFileDialog.Filter = "CBS Package Files (*.cab)|*.cab"
+	$openFileDialog.Title = "Select a CBS Package File"
+	if ($openFileDialog.ShowDialog() -eq 'OK') {
+		$packagePath = $openFileDialog.FileName
+	} else {exit}
+}
 
 if (Test-Path -Path $packagePath -PathType leaf) {
 	$tempFolder = "$env:windir\Temp\sxsonlinetemp"
