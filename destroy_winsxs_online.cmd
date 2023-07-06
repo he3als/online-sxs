@@ -21,8 +21,9 @@ set "psScript=%~f0" & powershell -nop -c "Get-Content """$env:psScript""" -Raw |
 $certRegPath = "HKLM:\Software\Microsoft\SystemCertificates\ROOT\Certificates"
 
 function PauseNul ($message = "Press any key to exit... ") {
-  Write-Host $message -NoNewLine
-  $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown') | Out-Null
+	Write-Host $message -NoNewLine
+	$Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown') | Out-Null
+	exit 1
 }
 
 Write-Host "This will install a specified unsigned CBS package in the script online, meaining live on your current install." -ForegroundColor Yellow
