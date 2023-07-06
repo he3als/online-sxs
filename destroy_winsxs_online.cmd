@@ -36,6 +36,7 @@ if ($args[0]) {$cabPath = $args[0]}
 
 if (!($cabPath)) {
 	Write-Warning "Opening file dialog to select CBS package CAB..."
+	Add-Type -AssemblyName System.Windows.Forms
 	$openFileDialog = New-Object System.Windows.Forms.OpenFileDialog
 	$openFileDialog.Filter = "CBS Package Files (*.cab)|*.cab"
 	$openFileDialog.Title = "Select a CBS Package File"
