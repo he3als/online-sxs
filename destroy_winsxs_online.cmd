@@ -65,6 +65,16 @@ $thumbprint = $certificate.Thumbprint
 # delete the temp .cat file
 [System.IO.File]::Delete($tempCatFilePath)
 
+Write-Warning "Checking if certificate has correct usage..."
+foreach ($usage in $certificate.Extensions.EnhancedKeyUsages) {
+	if ($usage.Value -eq "1.3.6.1.4.1.311.10.3.6") { $correctUsage = $true }
+}
+
+if (!($correctUsage)) {
+	Write-Host 'The certificate inside of the CAB selected does not have the "Windows System Component Verification" enhanced key usage.' -ForegroundColor Red
+	Exit-Prompt
+}
+
 Write-Warning "Installing certificate to store..."
 certutil -addstore root "$cerPath" | Out-Null
 
