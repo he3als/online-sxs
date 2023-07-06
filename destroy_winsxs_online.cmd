@@ -20,9 +20,9 @@ set "psScript=%~f0" & powershell -nop -c "Get-Content """$env:psScript""" -Raw |
 
 $certRegPath = "HKLM:\Software\Microsoft\SystemCertificates\ROOT\Certificates"
 
-function Exit-Prompt {
-	Read-Host "Press enter to exit"
-	exit 1
+function PauseNul ($message = "Press any key to exit... ") {
+  Write-Host $message -NoNewLine
+  $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown') | Out-Null
 }
 
 Write-Host "This will install a specified unsigned CBS package in the script online, meaining live on your current install." -ForegroundColor Yellow
@@ -49,7 +49,7 @@ $cert = (Get-AuthenticodeSignature $cabPath).SignerCertificate
 foreach ($usage in $cert.Extensions.EnhancedKeyUsages) { if ($usage.Value -eq "1.3.6.1.4.1.311.10.3.6") { $correctUsage = $true } }
 if (!($correctUsage)) {
 	Write-Host 'The certificate inside of the CAB selected does not have the "Windows System Component Verification" enhanced key usage.' -ForegroundColor Red
-	Exit-Prompt
+	PauseNul
 }
 $certPath = [System.IO.Path]::GetTempFileName()
 [System.IO.File]::WriteAllBytes($certPath, $cert.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Cert))
