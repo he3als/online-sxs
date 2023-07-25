@@ -26,9 +26,7 @@ function PauseNul ($message = "Press any key to exit... ") {
 	exit 1
 }
 
-Write-Host "This will install a specified self-signed CBS package, meaning live on your current install of Windows." -ForegroundColor Yellow
-# i've tested it enough and it's fine
-# Write-Host "Only run this in a virtual machine, it's highly experimental.`n" -ForegroundColor Red
+Write-Host "This will install a specified signed CBS package, meaning live on your current install of Windows." -ForegroundColor Yellow
 Start-Sleep 1
 pause
 cls
