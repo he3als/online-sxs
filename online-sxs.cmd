@@ -1,46 +1,56 @@
 <# : batch portion
 @echo off
-
 :: GPL-3.0-only license
 :: he3als 2023
+:: https://github.com/he3als/online-sxs
 
-:: set the 'onlinesxsSilent' variable to **anything** for silencing the script
-:: can only be used with the CLI argument
-:: ----------------------------------------------
-:: set onlinesxsSilent=true
-:: $env:onlinesxsSilent = 'true'
+if "%~1"=="-Help" (goto help) else (if "%~1"=="-help" (goto help) else (if "%~1"=="/h" (goto help) else (goto main)))
 
-:: you can pass a path to a .cab as a CLI argument to install it without user input
-if "%~2"=="" (
-	if not "%~f1"=="" (
-		if not exist "%~f1" (
-			echo Path argument specified doesn't exist.
-			exit /b 1
-		) else (
-			if not "%~x1"==".cab" (
-				echo Specified path argument is not a .cab file.
-				exit /b 1
-			)
+:help
+echo Usage = online-sxs.cmd [-Help] [[-Silent] -CabPath ""]
+exit /b
+
+:main
+if "%*"=="" (
+	fltmc >nul 2>&1 || (
+		echo Administrator privileges are required.
+		PowerShell Start -Verb RunAs '%0' 2> nul || (
+			echo You must run this script as admin.
+			pause & exit /b 1
 		)
-		set "cabArg=%~f1"
-	) else (
-		set onlinesxsSilent=
-		fltmc >nul 2>&1 || (
-			echo Administrator privileges are required.
-			PowerShell Start -Verb RunAs '%0' 2> nul || (
-				echo You must run this script as admin.
-				pause & exit /b 1
-			)
-			exit /b 0
-		)
+		exit /b 0
 	)
-) else (
-	echo Invalid ^(multiple^) arguments passsed.
-	exit /b 1
 )
 
-powershell -nop -ex unrestricted -c if (Test-Path """env:cabArg""") {$cabArg = """%cabArg%"""}; if (Test-Path """env:onlinesxsSilent""") {$silent = $true}; Get-Content """%~f0""" -Raw ^| iex & exit /b
+set args= & set "args1=%*"
+if defined args1 set "args=%args1:"='%"
+powershell -nop "& ([Scriptblock]::Create((Get-Content '%~f0' -Raw))) %args%"
+exit /b %errorlevel%
 : end batch / begin PowerShell #>
+
+param (
+    [string]$CabPath, 
+    [switch]$Silent
+)
+
+# You can automate this script with variables as well:
+# $CabPath = "C:\Package.cab"
+# Note: only works if $CabPath is defined
+# $Silent = $true
+
+if ($CabPath) {
+	$cabArg = $true
+
+    if (!(Test-Path $CabPath -PathType Leaf)) {
+        Write-Host "The specified .cab file does not exist or isn't a file." -ForegroundColor Red
+        exit 1
+    }
+
+    if (!((Get-Item $CabPath).Extension -eq '.cab')) {
+        Write-Host "The specified file is not a .cab file." -ForegroundColor Red
+        exit 1
+    }
+} else {$Silent = $false}
 
 $certRegPath = "HKLM:\Software\Microsoft\SystemCertificates\ROOT\Certificates"
 
@@ -66,7 +76,7 @@ if (!($cabArg)) {
 		$cabPath = $openFileDialog.FileName
 		cls
 	} else {exit}
-} else {$cabPath = $cabArg}
+}
 
 try {
 	if (!($silent)) {Write-Warning "Importing and checking certificate..."}
