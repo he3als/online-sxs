@@ -6,8 +6,17 @@
 
 :: you can pass a path to a .cab as a CLI argument to install it without user input
 if "%~2"=="" (
-	if not "%~1"=="" (
-		set "cabArg=%~1"
+	if not "%~f1"=="" (
+		if not exist "%~f1" (
+			echo Path specified doesn't exist.
+			exit /b 1
+		) else (
+			if not "%~x1"==".cab" (
+				echo Specified path is not a .cab file.
+				exit /b 1
+			)
+		)
+		set "cabArg=%~f1"
 	) else (
 		fltmc >nul 2>&1 || (
 			echo Administrator privileges are required.
@@ -19,7 +28,7 @@ if "%~2"=="" (
 		)
 	)
 ) else (
-	echo Invalid arguments passsed.
+	echo Invalid ^(multiple^) arguments passsed.
 	exit /b 1
 )
 
