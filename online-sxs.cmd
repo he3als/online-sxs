@@ -84,7 +84,7 @@ try {
 		$cert = (Get-AuthenticodeSignature $cabPath).SignerCertificate
 		foreach ($usage in $cert.Extensions.EnhancedKeyUsages) { if ($usage.Value -eq "1.3.6.1.4.1.311.10.3.6") { $correctUsage = $true } }
 		if (!($correctUsage)) {
-			if (!($silent)) {Write-Host 'The certificate inside of the CAB selected does not have the "Windows System Component Verification" enhanced key usage.' -ForegroundColor Red}
+			Write-Host 'The certificate inside of the CAB selected does not have the "Windows System Component Verification" enhanced key usage.' -ForegroundColor Red
 			if (!($cabArg)) {PauseNul}; exit 1
 		}
 		$certPath = [System.IO.Path]::GetTempFileName()
