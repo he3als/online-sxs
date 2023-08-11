@@ -13,9 +13,10 @@ exit /b
 :main
 fltmc >nul 2>&1 || (
 	echo Administrator privileges are required.
-	PowerShell Start -Verb RunAs '%0' -ArgumentList '%*' 2> nul || (
-		echo You must run this script as admin.
-		pause & exit /b 1
+	if "%*"=="" (
+		PowerShell Start -Verb RunAs '%0' 2> nul || goto error
+	) else (
+		PowerShell Start -Verb RunAs '%0' -ArgumentList '%*' 2> nul || goto error
 	)
 	exit /b 0
 )
@@ -24,6 +25,11 @@ set args= & set "args1=%*"
 if defined args1 set "args=%args1:"='%"
 powershell -nop "& ([Scriptblock]::Create((Get-Content '%~f0' -Raw))) %args%"
 exit /b %errorlevel%
+
+:error
+echo You must run this script as admin.
+pause & exit /b 1
+
 : end batch / begin PowerShell #>
 
 param (
@@ -72,18 +78,19 @@ if (!($cabArg)) {
 	$openFileDialog.Filter = "CBS Package Files (*.cab)|*.cab"
 	$openFileDialog.Title = "Select a CBS Package File"
 	if ($openFileDialog.ShowDialog() -eq 'OK') {
-		$CabPaths = $openFileDialog.FileNames
 		Clear-Host
 	} else {exit}
 }
 
-foreach ($cabPath in $CabPaths) {
+function ProcessCab($cabPath) {
 	try {
-		$filePath = Split-Path $cabPath -Leaf
-		if ($notFirstCab) {Write-Host ""}
-		Write-Host "Installing $filePath..." -ForegroundColor Green
-		Write-Host "----------------------------------------------------------------------------------------" -ForegroundColor Blue
-		$notFirstCab = $true
+		if (!($Silent)) {
+			$filePath = Split-Path $cabPath -Leaf
+			if ($global:notFirstCab) {Write-Host ""}
+			Write-Host "Installing $filePath..." -ForegroundColor Green
+			Write-Host "----------------------------------------------------------------------------------------" -ForegroundColor Blue
+			$global:notFirstCab = $true
+		}
 
 		if (!($silent)) {Write-Warning "Importing and checking certificate..."}
 		try {
@@ -116,6 +123,12 @@ foreach ($cabPath in $CabPaths) {
 		Get-ChildItem "Cert:\LocalMachine\Root\$($cert.Thumbprint)" | Remove-Item -Force | Out-Null
 		Remove-Item "$certRegPath\8A334AA8052DD244A647306A76B8178FA215F344" -Force -Recurse | Out-Null
 	}
+}
+
+if ($cabArg) {
+	foreach ($cabPath in $CabPaths) {ProcessCab $cabPath}
+} else {
+	foreach ($cabPath in $openFileDialog.FileNames) {ProcessCab $cabPath}
 }
 
 if (!($silent)) {Write-Host "`nCompleted!" -ForegroundColor Green}
