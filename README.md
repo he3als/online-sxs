@@ -1,5 +1,7 @@
 # Online SxS
 
+**Archived and only maintained on Atlas**
+
 Installs Windows CBS packages on a live installation (using the `/online` DISM argument) of Windows. See [`echnobas`/sxsc](https://github.com/echnobas/sxsc) to generate packages.
 
 The packages and configs included are personal configs and may or may not work.
