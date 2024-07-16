@@ -1,6 +1,17 @@
-# Online SxS
+## **Archived and only maintained on Atlas**
 
-**Archived and only maintained on Atlas**
+> [!CAUTION]
+> I only maintain a much more developed version of `online-sxs` on AtlasOS (GPLv3):
+> 
+> - Atlas: https://github.com/Atlas-OS/Atlas
+>
+> For some context, this repo was made immediately after finding a method for installing custom CBS packages on a live install. It was only an initial implementation, unlike what Atlas has now.
+>
+> Anything in this repository is completely unsupported and **could break your system**.
+
+---
+
+# Online SxS
 
 Installs Windows CBS packages on a live installation (using the `/online` DISM argument) of Windows. See [`echnobas`/sxsc](https://github.com/echnobas/sxsc) to generate packages.
 
